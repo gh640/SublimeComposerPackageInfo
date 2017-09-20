@@ -118,10 +118,7 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
             'meta.structure.dictionary.key.json',
             'string.quoted.double.json'
         ]
-        for n in names:
-            if n not in scope_name:
-                return False
-        return True
+        return all(n in scope_name for n in names)
 
     def _get_selected_pacakge_name(self, point):
         quoted_text = self.view.substr(self.view.extract_scope(point))
