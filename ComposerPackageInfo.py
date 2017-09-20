@@ -132,7 +132,7 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
 
     def _fetch_package_info(self, name):
         response = requests.get(URL_JSON.format(package=name))
-        if not response.status_code != '200':
+        if response.status_code != 200:
             raise BaseException('Package data fetch failed.')
         return json.loads(response.text)
 
