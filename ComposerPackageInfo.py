@@ -142,7 +142,6 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
             name = package['name']
             url = URL_PAGE.format(package=package['name'])
             description = self._truncate(package['description'], LENGTH_DESC)
-            print(data)
             return {
                 'name': name,
                 'description': description,
