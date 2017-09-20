@@ -3,9 +3,12 @@
 '''Provides function related to PHP Composer packages.
 '''
 
+from datetime import datetime
 import json
+import os
 import os.path
 import re
+import sqlite3
 import webbrowser
 import requests
 import sublime
@@ -131,10 +134,16 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
         return False
 
     def _fetch_package_info(self, name):
-        response = requests.get(URL_JSON.format(package=name))
-        if response.status_code != 200:
-            raise BaseException('Package data fetch failed.')
-        return json.loads(response.text)
+        cache = PackageCache()
+        package_data = cache.get_package_data(name)
+        if not package_data:
+            response = requests.get(URL_JSON.format(package=name))
+            if response.status_code != 200:
+                raise BaseException('Package data fetch failed.')
+            package_data = json.loads(response.text)
+            cache.add_package_data(name, package_data)
+
+        return package_data
 
     def _extract_pakcage_info(self, data, name):
         try:
@@ -179,6 +188,59 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
 
     def _truncate(self, string, count):
         return string[:count] + ('...' if string[count:] else '')
+
+
+class ComposerPackageInfoClearAllCache(sublime_plugin.ApplicationCommand):
+
+    def run(self):
+        cache = PackageCache()
+        cache.clear_all_cache()
+
+
+class PackageCache:
+
+    def __init__(self):
+        self.conn = sqlite3.connect(self._get_path())
+        self._create_table_if_not_exists()
+
+    def __del__(self):
+        if self.conn:
+            self.conn.close()
+
+    def get_package_data(self, name):
+        cur = self.conn.cursor()
+        cur.execute('SELECT * FROM packages WHERE name=?', (name, ))
+        package = cur.fetchone()
+        cur.close()
+
+        if package:
+            data = package[1]
+            return json.loads(data)
+
+        return False
+
+    def add_package_data(self, name, data):
+        row = (name, json.dumps(data), get_now())
+        cur = self.conn.cursor()
+        cur.execute('INSERT INTO packages VALUES (?, ?, ?)', row)
+        self.conn.commit()
+        cur.close()
+
+    def clear_all_cache(self):
+        if self.conn:
+            self.conn.close()
+        os.remove(self._get_path())
+
+    def _get_path(self):
+        dir_name = os.path.dirname(os.path.realpath(__file__))
+        return os.path.join(dir_name, 'cache.sqlite3')
+
+    def _create_table_if_not_exists(self):
+        self.conn.execute('CREATE TABLE IF NOT EXISTS packages (name text, data blob, updated_at integer)')
+
+
+def get_now():
+    return int(datetime.now().timestamp())
 
 
 class BaseException(Exception):
