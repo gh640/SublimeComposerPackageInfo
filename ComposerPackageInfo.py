@@ -106,6 +106,14 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
             sublime.set_timeout(lambda: self.view.erase_status(MESSAGE_KEY),
                                 MESSAGE_TTL)
 
+    def on_popup_navigate(self, href):
+        if href.startswith('https://'):
+            webbrowser.open_new_tab(href)
+        elif href.startswith(PREFIX_COPY):
+            sublime.set_clipboard(href[len(PREFIX_COPY):])
+
+        mdpopups.hide_popup(self.view)
+
     def _is_composer(self):
         return self._get_basename() == 'composer.json'
 
@@ -149,14 +157,13 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
         try:
             package = data['package']
             name = package['name']
-            url = URL_PAGE.format(package=package['name'])
             description = self._truncate(package['description'], LENGTH_DESC)
             return {
                 'name': name,
                 'description': description,
                 'downloads_total': package['downloads']['total'],
                 'favers': package['favers'],
-                'url_packagist': url,
+                'url_packagist': URL_PAGE.format(package=package['name']),
                 'url_repo': package['repository'],
                 'command_require': PREFIX_COPY + CMD_REQUIRE.format(name),
                 'command_remove': PREFIX_COPY + CMD_REMOVE.format(name),
@@ -176,15 +183,7 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
                             max_width=400,
                             location=location,
                             flags=sublime.HIDE_ON_MOUSE_MOVE_AWAY,
-                            on_navigate=self.on_phantom_click)
-
-    def on_phantom_click(self, href):
-        if href.startswith('https://'):
-            webbrowser.open_new_tab(href)
-        elif href.startswith(PREFIX_COPY):
-            sublime.set_clipboard(href[len(PREFIX_COPY):])
-
-        mdpopups.hide_popup(self.view)
+                            on_navigate=self.on_popup_navigate)
 
     def _truncate(self, string, count):
         return string[:count] + ('...' if string[count:] else '')
