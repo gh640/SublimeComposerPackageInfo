@@ -16,8 +16,8 @@ import sublime_plugin
 import mdpopups
 
 
-URL_JSON = 'https://packagist.org/packages/{package}.json'
-URL_PAGE = 'https://packagist.org/packages/{package}'
+URL_JSON = 'https://packagist.org/packages/{name}.json'
+URL_PAGE = 'https://packagist.org/packages/{name}'
 TEMPLATE = '''
 # {name}
 
@@ -28,7 +28,7 @@ TEMPLATE = '''
 - Command: [require]({command_require}) / [remove]({command_remove})
 
 <div class="close-btn-wrapper">
-    <a href="close">{close_btn}</a>
+    <a href="close">{btn_close}</a>
 </div>
 '''
 CSS = '''
@@ -66,9 +66,9 @@ body {
 }
 '''
 WRAPPER_CLASS = 'composer-package-info'
-CMD_REQUIRE = 'composer require {}'
-CMD_REMOVE = 'composer remove {}'
 PREFIX_COPY = 'copy: '
+CMD_REQUIRE = PREFIX_COPY + 'composer require {name}'
+CMD_REMOVE = PREFIX_COPY + 'composer remove {name}'
 MESSAGE_KEY = 'composer_info'
 MESSAGE_TTL = 2000
 LENGTH_DESC = 100
@@ -142,16 +142,7 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
         return False
 
     def _fetch_package_info(self, name):
-        cache = PackageCache()
-        package_data = cache.get_package_data(name)
-        if not package_data:
-            response = requests.get(URL_JSON.format(package=name))
-            if response.status_code != 200:
-                raise BaseException('Package data fetch failed.')
-            package_data = json.loads(response.text)
-            cache.add_package_data(name, package_data)
-
-        return package_data
+        return PackageDataManager().get_data(name)
 
     def _extract_pakcage_info(self, data, name):
         try:
@@ -163,11 +154,11 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
                 'description': description,
                 'downloads_total': package['downloads']['total'],
                 'favers': package['favers'],
-                'url_packagist': URL_PAGE.format(package=package['name']),
+                'url_packagist': URL_PAGE.format(name=name),
                 'url_repo': package['repository'],
-                'command_require': PREFIX_COPY + CMD_REQUIRE.format(name),
-                'command_remove': PREFIX_COPY + CMD_REMOVE.format(name),
-                'close_btn': '[' + chr(0x00D7) + ']',
+                'command_require': CMD_REQUIRE.format(name=name),
+                'command_remove': CMD_REMOVE.format(name=name),
+                'btn_close': '[' + chr(0x00D7) + ']',
             }
         except Exception as e:
             raise BaseException('Package data extraction failed.')
@@ -190,13 +181,37 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
 
 
 class ComposerPackageInfoClearAllCache(sublime_plugin.ApplicationCommand):
+    '''Application command named composer_package_info_clear_all_cache.
+    '''
 
     def run(self):
         cache = PackageCache()
         cache.clear_all_cache()
 
 
+class PackageDataManager:
+    '''Package data manager.
+    '''
+
+    def get_data(self, name):
+        cache = PackageCache()
+        package_data = cache.get_package_data(name)
+        if not package_data:
+            package_data = self._fetch_data(name)
+            cache.add_package_data(name, package_data)
+        return package_data
+
+    def _fetch_data(self, name):
+        response = requests.get(URL_JSON.format(name=name))
+        if response.status_code != 200:
+            raise BaseException('Package data fetch failed.')
+        package_data = json.loads(response.text)
+        return package_data
+
+
 class PackageCache:
+    '''Package cache manager.
+    '''
 
     def __init__(self):
         self.conn = sqlite3.connect(self._get_path())
