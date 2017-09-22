@@ -2,7 +2,7 @@
 
 A Sublime Text 3 package which provides a popup for Composer packages.
 
-![Capture](https://raw.githubusercontent.com/gh640/SublimeComposerPackageInfo/master/assets/capture.gif)
+![Capture](https://raw.githubusercontent.com/gh640/SublimeComposerPackageInfo/master/assets/capture.png)
 
 
 ## Installation
@@ -17,6 +17,8 @@ A Sublime Text 3 package which provides a popup for Composer packages.
 1. Open a `composer.json` file.
 2. Mouse over a package name in `require` or `require-dev`.
 3. The meta data of the package is fetched from Packagist ([API](https://packagist.org/apidoc)) and shown in a popup window automatically.
+
+![Capture](https://raw.githubusercontent.com/gh640/SublimeComposerPackageInfo/master/assets/capture.gif)
 
 ### Clearing local cache
 
