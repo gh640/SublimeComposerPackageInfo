@@ -76,7 +76,7 @@ SETTINGS_KEY = 'ComposerPackageInfo.sublime-settings'
 CACHE_MAX_COUNT_DEFAULT = 1000
 
 
-class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
+class ComposerPackageInfoPackageInfo(sublime_plugin.ViewEventListener):
     '''A view event listener for showing composer package data.
     '''
 
