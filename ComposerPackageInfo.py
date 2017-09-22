@@ -72,6 +72,8 @@ CMD_REMOVE = PREFIX_COPY + 'composer remove {name}'
 MESSAGE_KEY = 'composer_info'
 MESSAGE_TTL = 2000
 LENGTH_DESC = 100
+SETTINGS_KEY = 'ComposerPackageInfo.sublime-settings'
+CACHE_MAX_COUNT_DEFAULT = 1000
 
 
 class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
@@ -222,13 +224,26 @@ class PackageCache:
             self.conn.close()
 
     def get_package_data(self, name):
+        self.conn.row_factory = sqlite3.Row
         cur = self.conn.cursor()
         cur.execute('SELECT * FROM packages WHERE name=?', (name, ))
         package = cur.fetchone()
+        cur.execute('UPDATE packages SET updated_at=? WHERE name=?', (get_now(), name))
+        self.conn.commit()
+
+        cache_max_count = self._get_cache_max_count()
+        if cache_max_count > 0:
+            cur.execute('SELECT count(*) FROM packages')
+            count = cur.fetchone()[0]
+            if count > cache_max_count:
+                cur.execute('''DELETE FROM packages WHERE name NOT IN (
+                    SELECT name FROM packages ORDER BY updated_at DESC LIMIT ?
+                )''', (cache_max_count, ))
+                self.conn.commit()
         cur.close()
 
         if package:
-            data = package[1]
+            data = package['data']
             return json.loads(data)
 
         return False
@@ -251,6 +266,14 @@ class PackageCache:
 
     def _create_table_if_not_exists(self):
         self.conn.execute('CREATE TABLE IF NOT EXISTS packages (name text, data blob, updated_at integer)')
+
+    def _get_cache_max_count(self):
+        settings = sublime.load_settings(SETTINGS_KEY)
+        max_count = settings.get('cache_max_count', CACHE_MAX_COUNT_DEFAULT)
+        try:
+            return int(max_count)
+        except ValueError as e:
+            return CACHE_MAX_COUNT_DEFAULT
 
 
 def get_now():
