@@ -182,7 +182,7 @@ class ComposerInfoPackageInfo(sublime_plugin.ViewEventListener):
         return string[:count] + ('...' if string[count:] else '')
 
 
-class ComposerPackageInfoClearAllCache(sublime_plugin.ApplicationCommand):
+class ComposerPackageInfoClearAllCacheCommand(sublime_plugin.ApplicationCommand):
     '''Application command named composer_package_info_clear_all_cache.
     '''
 
