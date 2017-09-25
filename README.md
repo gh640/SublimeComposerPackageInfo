@@ -7,7 +7,11 @@ A Sublime Text 3 package which provides a popup for Composer packages.
 
 ## Installation
 
-...
+The following way is not available before this package is registered in the Package Control ([PR](https://github.com/wbond/package_control_channel/pull/6616)).
+
+1. Install the [Package Control](https://packagecontrol.io/installation) to your Sublime Text 3.
+2. Open the command palette and select `Package Controll: Install Package`.
+3. Search for and select `ComposerPackageInfo`.
 
 
 ## Usage
