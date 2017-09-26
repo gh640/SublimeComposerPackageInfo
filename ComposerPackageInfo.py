@@ -97,7 +97,7 @@ class ComposerPackageInfoPackageInfo(sublime_plugin.ViewEventListener):
         self.view.set_status(MESSAGE_KEY, 'Fetching data...')
         try:
             data_raw = self._fetch_package_info(package_name)
-            data = self._extract_pakcage_info(data_raw, package_name)
+            data = self._extract_package_info(data_raw, package_name)
         except BaseException as e:
             sublime.set_timeout(lambda: self.view.erase_status(MESSAGE_KEY),
                                 MESSAGE_TTL)
@@ -146,7 +146,7 @@ class ComposerPackageInfoPackageInfo(sublime_plugin.ViewEventListener):
     def _fetch_package_info(self, name):
         return PackageDataManager().get_data(name)
 
-    def _extract_pakcage_info(self, data, name):
+    def _extract_package_info(self, data, name):
         try:
             package = data['package']
             name = package['name']
