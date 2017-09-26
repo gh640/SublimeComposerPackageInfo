@@ -261,8 +261,9 @@ class PackageCache:
         os.remove(self._get_path())
 
     def _get_path(self):
-        dir_name = os.path.dirname(os.path.realpath(__file__))
-        return os.path.join(dir_name, 'cache.sqlite3')
+        cache_manager = CacheManager()
+        cache_manager.create_directory()
+        return cache_manager.get_path('cache.sqlite3')
 
     def _create_table_if_not_exists(self):
         self.conn.execute('CREATE TABLE IF NOT EXISTS packages (name text, data blob, updated_at integer)')
@@ -274,6 +275,22 @@ class PackageCache:
             return int(max_count)
         except ValueError as e:
             return CACHE_MAX_COUNT_DEFAULT
+
+
+class CacheManager:
+    '''Cache manager for Sublime Text cache system.
+    '''
+
+    def get_path(self, name):
+        return os.path.join(self._get_directory_path(), name)
+
+    def create_directory(self):
+        directory = self._get_directory_path()
+        if not os.path.isdir(directory):
+            os.mkdir(directory, mode=0o700)
+
+    def _get_directory_path(self):
+        return os.path.join(sublime.cache_path(), __package__)
 
 
 def get_now():
