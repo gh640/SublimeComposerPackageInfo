@@ -24,11 +24,21 @@ A Sublime Text 3 package which provides a popup for Composer packages.
 
 ### Clearing local cache
 
-Fetched package data are stored in the local SQLite database `cache.sqlite3` in the pacakge directory. You can delete all the cache with the command `ComposerPackageInfo: Clear all cache`.
+Fetched package data are stored in the local SQLite database `cache.sqlite3` in the Sublime Text's cache directory. You can delete all the cache with the command `ComposerPackageInfo: Clear all cache`.
 
 1. Open the command palette.
 2. Search and select `ComposerPackageInfo: Clear all cache`.
 3. The cache data are deleted.
+
+
+## Settings
+
+There are following setting options.
+
+- `cache_max_count`
+
+`cache_max_count`
+: (default: `1000`) Max number of locally cached package data. If the number of cached pacakge data gets greater than this value, old tuples are deleted from the database table for cache.
 
 
 ## License
