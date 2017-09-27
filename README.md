@@ -38,7 +38,7 @@ There are following setting options.
 - `cache_max_count`
 
 `cache_max_count`
-: (default: `1000`) Max number of locally cached package data. If the number of cached pacakge data gets greater than this value, old tuples are deleted from the database table for cache.
+:    (default: `1000`) Max number of locally cached package data. If the number of cached pacakge data gets greater than this value, old tuples are deleted from the database table for cache.
 
 
 ## License
