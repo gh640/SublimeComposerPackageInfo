@@ -70,7 +70,7 @@ PREFIX_COPY = 'copy: '
 CMD_REQUIRE = PREFIX_COPY + 'composer require {name}'
 CMD_REMOVE = PREFIX_COPY + 'composer remove {name}'
 MESSAGE_KEY = 'composer_info'
-MESSAGE_TTL = 2000
+MESSAGE_TTL = 4000
 LENGTH_DESC = 100
 SETTINGS_KEY = 'ComposerPackageInfo.sublime-settings'
 CACHE_MAX_COUNT_DEFAULT = 1000
@@ -94,25 +94,23 @@ class ComposerPackageInfoPackageInfo(sublime_plugin.ViewEventListener):
         if not self._is_valid_package_name(package_name):
             return
 
-        self.view.set_status(MESSAGE_KEY, 'Fetching data...')
+        show_status_message(self.view, 'Searching Composer package data...')
         try:
             data_raw = self._fetch_package_info(package_name)
             data = self._extract_package_info(data_raw, package_name)
         except BaseException as e:
-            sublime.set_timeout(lambda: self.view.erase_status(MESSAGE_KEY),
-                                MESSAGE_TTL)
             raise e
         else:
             self._show_popup(data, point)
-            self.view.set_status(MESSAGE_KEY, 'Data fetched successfully.')
-            sublime.set_timeout(lambda: self.view.erase_status(MESSAGE_KEY),
-                                MESSAGE_TTL)
+            show_status_message(self.view, 'Composer package data is found.')
 
     def on_popup_navigate(self, href):
         if href.startswith('https://'):
             webbrowser.open_new_tab(href)
+            show_status_message(self.view, 'URL is opened.')
         elif href.startswith(PREFIX_COPY):
             sublime.set_clipboard(href[len(PREFIX_COPY):])
+            show_status_message(self.view, 'Command is copied.')
 
         mdpopups.hide_popup(self.view)
 
@@ -293,9 +291,20 @@ class CacheManager:
         return os.path.join(sublime.cache_path(), __package__)
 
 
+def show_status_message(view, message):
+    '''Shows a temporary status message.
+    '''
+    view.set_status(MESSAGE_KEY, message)
+    sublime.set_timeout(lambda: view.erase_status(MESSAGE_KEY), MESSAGE_TTL)
+
+
 def get_now():
+    '''Gets the current timestamp.
+    '''
     return int(datetime.now().timestamp())
 
 
 class BaseException(Exception):
+    '''Base exception class for this package.
+    '''
     pass
