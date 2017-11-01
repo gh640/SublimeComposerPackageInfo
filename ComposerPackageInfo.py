@@ -62,6 +62,10 @@ body {
     margin-top: 12px;
 }
 .close-btn-wrapper a {
+    background-color: var(--mdpopups-admon-error-bg);
+    color: var(--mdpopups-admon-error-fg);
+    font-size: 10px;
+    padding: 1px 6px;
     text-decoration: none;
 }
 '''
@@ -159,7 +163,7 @@ class ComposerPackageInfoPackageInfo(sublime_plugin.ViewEventListener):
                 'url_repo': package['repository'],
                 'command_require': CMD_REQUIRE.format(name=name),
                 'command_remove': CMD_REMOVE.format(name=name),
-                'btn_close': '[' + chr(0x00D7) + ']',
+                'btn_close': chr(0x00D7),
             }
         except Exception as e:
             raise BaseException('Package data extraction failed.')
