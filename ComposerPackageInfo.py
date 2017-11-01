@@ -118,7 +118,8 @@ class ComposerPackageInfoPackageInfo(sublime_plugin.ViewEventListener):
         return self._get_basename() == 'composer.json'
 
     def _get_basename(self):
-        return os.path.basename(self.view.file_name())
+        file_name = self.view.file_name()
+        return os.path.basename(file_name) if file_name else ''
 
     def _is_on_text(self, hover_zone):
         return hover_zone == sublime.HOVER_TEXT
