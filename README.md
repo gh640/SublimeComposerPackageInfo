@@ -41,6 +41,12 @@ There are following setting options.
 :    (default: `1000`) Max number of locally cached package data. If the number of cached pacakge data gets greater than this value, old tuples are deleted from the database table for cache.
 
 
+## Links
+
+- [`SublimePhpArrayConverter`](https://github.com/gh640/SublimePhpArrayConverter): A Sublime Text 3 package which converts PHP array syntax.
+- [`PypiPackageInfo`](https://github.com/gh640/SublimePypiPackageInfo): `ComposerPackageInfo` for Python (PyPI) packages.
+
+
 ## License
 
 Licensed under the MIT license.
