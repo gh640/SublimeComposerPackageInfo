@@ -43,7 +43,7 @@ There are following setting options.
 
 ## Links
 
-- [`SublimePhpArrayConverter`](https://github.com/gh640/SublimePhpArrayConverter): A Sublime Text 3 package which converts PHP array syntax.
+- [`PhpArrayConverter`](https://github.com/gh640/SublimePhpArrayConverter): A Sublime Text 3 package which converts PHP array syntax.
 - [`PypiPackageInfo`](https://github.com/gh640/SublimePypiPackageInfo): `ComposerPackageInfo` for Python (PyPI) packages.
 
 
