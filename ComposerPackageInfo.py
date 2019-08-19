@@ -131,7 +131,7 @@ class ComposerPackageInfoPackageInfo(sublime_plugin.ViewEventListener):
     def _is_in_scope(self, point):
         scope_name = self.view.scope_name(point)
         names = [
-            'meta.structure.dictionary.key.json',
+            'meta.mapping.key.json',
             'string.quoted.double.json'
         ]
         return all(n in scope_name for n in names)
